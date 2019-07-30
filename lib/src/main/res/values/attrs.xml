@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ShadowView">
+        <attr name="sv_cornerRadius" format="dimension"/>
+        <attr name="sv_shadowRadius" format="dimension"/>
+        <attr name="sv_shadowColor" format="color"/>
+        <attr name="sv_dx" format="dimension"/>
+        <attr name="sv_dy" format="dimension"/>
+        <attr name="sv_background" format="color"/>
+    </declare-styleable>
+</resources>
