@@ -7,5 +7,6 @@
         <attr name="sv_dx" format="dimension"/>
         <attr name="sv_dy" format="dimension"/>
         <attr name="sv_background" format="color"/>
+        <attr name="sv_pressbackground" format="color"/>
     </declare-styleable>
 </resources>

@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.sxw.lib.R;
@@ -26,6 +27,7 @@ public class ShadowHelper {
     private float mDx;
     private float mDy;
     private int mBgColor;
+    private int mPressColor;
 
     private Bitmap mShadowBitmap;
     private RectF mShadowRect;
@@ -46,10 +48,12 @@ public class ShadowHelper {
             mDy = attr.getDimension(R.styleable.ShadowView_sv_dy, 0);
             mShadowColor = attr.getColor(R.styleable.ShadowView_sv_shadowColor, resources.getColor(R.color.default_shadow_color));
             mBgColor = attr.getColor(R.styleable.ShadowView_sv_background, Color.WHITE);
+            mPressColor = attr.getColor(R.styleable.ShadowView_sv_pressbackground, resources.getColor(R.color.press));
         } finally {
             attr.recycle();
         }
         mPaint = new Paint();
+        mPaint.setAntiAlias(true);
         mPaint.setColor(mBgColor);
         mPaint.setStyle(Paint.Style.FILL);
 
@@ -57,6 +61,23 @@ public class ShadowHelper {
         mMShadowPaint.setAntiAlias(true);
         mMShadowPaint.setColor(mShadowColor);
         mMShadowPaint.setStyle(Paint.Style.FILL);
+
+        mView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        mPaint.setColor(mPressColor);
+                        mView.invalidate();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        mPaint.setColor(mBgColor);
+                        mView.invalidate();
+                        break;
+                }
+                return false;
+            }
+        });
     }
 
     public void createShadowBitmap(int shadowWidth, int shadowHeight) {
@@ -86,9 +107,15 @@ public class ShadowHelper {
 
     public void onDraw(Canvas canvas) {
         if (mShadowBitmap != null) {
+            canvas.save();
             canvas.drawBitmap(mShadowBitmap, 0, 0, new Paint(Paint.ANTI_ALIAS_FLAG));
             canvas.drawRoundRect(mShadowRect, mCornerRadius, mCornerRadius, mPaint);
+            canvas.restore();
         }
+    }
+
+    public RectF getShadowRect() {
+        return mShadowRect;
     }
 
     public void reDraw() {

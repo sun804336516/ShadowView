@@ -11,22 +11,25 @@
     <com.sxw.lib.shadowview.ShadowTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:clickable="true"
         android:gravity="center"
         android:padding="20dp"
         android:text="TextView阴影"
-        android:textColor="#000000"
+        android:textColor="@drawable/press_textcolor"
         android:textSize="16sp"/>
 
     <com.sxw.lib.shadowview.ShadowLinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="4dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="20dp"
+            android:clickable="true"
             android:text="LinearLayout阴影"
             android:textColor="#000000"
             android:textSize="16sp"/>
