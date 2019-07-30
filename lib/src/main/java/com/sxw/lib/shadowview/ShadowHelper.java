@@ -1,13 +1,14 @@
 package com.sxw.lib.shadowview;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,12 +29,17 @@ public class ShadowHelper {
     private float mDy;
     private int mBgColor;
     private int mPressColor;
+    private int mCheckColor;
 
     private Bitmap mShadowBitmap;
     private RectF mShadowRect;
     private Paint mPaint;
-    private Paint mMShadowPaint;
+    private Paint mShadowPaint;
     private View mView;
+    private boolean mChecked;
+
+    int[] press = new int[]{android.R.attr.state_pressed};
+    int[] checked = new int[]{android.R.attr.state_checked};
 
     public ShadowHelper(View view, Context context, AttributeSet attrs) {
         this.mView = view;
@@ -46,9 +52,28 @@ public class ShadowHelper {
             mShadowRadius = attr.getDimension(R.styleable.ShadowView_sv_shadowRadius, resources.getDimension(R.dimen.default_shadow_radius));
             mDx = attr.getDimension(R.styleable.ShadowView_sv_dx, 0);
             mDy = attr.getDimension(R.styleable.ShadowView_sv_dy, 0);
-            mShadowColor = attr.getColor(R.styleable.ShadowView_sv_shadowColor, resources.getColor(R.color.default_shadow_color));
-            mBgColor = attr.getColor(R.styleable.ShadowView_sv_background, Color.WHITE);
-            mPressColor = attr.getColor(R.styleable.ShadowView_sv_pressbackground, resources.getColor(R.color.press));
+            mShadowColor = attr.getColor(R.styleable.ShadowView_sv_shadowColor, ContextCompat.getColor(context, R.color.shadow_color));
+//            mBgColor = attr.getColor(R.styleable.ShadowView_sv_background, ContextCompat.getColor(context, R.color.shadow_backgroud));
+//            mPressColor = attr.getColor(R.styleable.ShadowView_sv_pressbackground, ContextCompat.getColor(context, R.color.shadow_press));
+
+            ColorStateList colorStateList = attr.getColorStateList(R.styleable.ShadowView_sv_colors);
+
+            if (colorStateList != null) {
+
+                mBgColor = colorStateList.getDefaultColor();
+                if (mBgColor == 0) {
+                    mBgColor = ContextCompat.getColor(context, R.color.shadow_backgroud);
+                }
+
+                mPressColor = colorStateList.getColorForState(press, ContextCompat.getColor(context, R.color.shadow_press));
+                mCheckColor = colorStateList.getColorForState(checked, ContextCompat.getColor(context, R.color.shadow_checked));
+            } else {
+                mBgColor = ContextCompat.getColor(context, R.color.shadow_backgroud);
+
+                mPressColor = ContextCompat.getColor(context, R.color.shadow_backgroud);
+                mCheckColor = ContextCompat.getColor(context, R.color.shadow_backgroud);
+            }
+
         } finally {
             attr.recycle();
         }
@@ -57,10 +82,10 @@ public class ShadowHelper {
         mPaint.setColor(mBgColor);
         mPaint.setStyle(Paint.Style.FILL);
 
-        mMShadowPaint = new Paint();
-        mMShadowPaint.setAntiAlias(true);
-        mMShadowPaint.setColor(mShadowColor);
-        mMShadowPaint.setStyle(Paint.Style.FILL);
+        mShadowPaint = new Paint();
+        mShadowPaint.setAntiAlias(true);
+        mShadowPaint.setColor(mShadowColor);
+        mShadowPaint.setStyle(Paint.Style.FILL);
 
         mView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -78,6 +103,7 @@ public class ShadowHelper {
                 return false;
             }
         });
+
     }
 
     public void createShadowBitmap(int shadowWidth, int shadowHeight) {
@@ -99,10 +125,10 @@ public class ShadowHelper {
         mShadowRect.bottom -= Math.abs(mDy);
 
         if (!mView.isInEditMode()) {
-            mMShadowPaint.setShadowLayer(mShadowRadius, mDx, mDy, mShadowColor);
+            mShadowPaint.setShadowLayer(mShadowRadius, mDx, mDy, mShadowColor);
         }
 
-        canvas.drawRoundRect(mShadowRect, mCornerRadius, mCornerRadius, mMShadowPaint);
+        canvas.drawRoundRect(mShadowRect, mCornerRadius, mCornerRadius, mShadowPaint);
     }
 
     public void onDraw(Canvas canvas) {
@@ -114,11 +140,24 @@ public class ShadowHelper {
         }
     }
 
-    public RectF getShadowRect() {
-        return mShadowRect;
-    }
-
     public void reDraw() {
         mShadowBitmap = null;
+        mView.requestLayout();
+    }
+
+    public void setChecked(boolean checked) {
+        if (mChecked != checked) {
+            mChecked = checked;
+            mPaint.setColor(mChecked ? mCheckColor : mBgColor);
+            mView.invalidate();
+        }
+    }
+
+    public boolean isChecked() {
+        return mChecked;
+    }
+
+    public void toggle() {
+        setChecked(!mChecked);
     }
 }

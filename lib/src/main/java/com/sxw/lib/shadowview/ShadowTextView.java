@@ -4,11 +4,12 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
+import android.widget.Checkable;
 
 /**
  * 作者：sxw on 2019/7/29 15:07
  */
-public class ShadowTextView extends AppCompatTextView {
+public class ShadowTextView extends AppCompatTextView implements Checkable {
 
     private ShadowHelper mShadowHelper;
 
@@ -44,4 +45,18 @@ public class ShadowTextView extends AppCompatTextView {
         super.onDraw(canvas);
     }
 
+    @Override
+    public void setChecked(boolean checked) {
+        mShadowHelper.setChecked(checked);
+    }
+
+    @Override
+    public boolean isChecked() {
+        return mShadowHelper.isChecked();
+    }
+
+    @Override
+    public void toggle() {
+        mShadowHelper.toggle();
+    }
 }
